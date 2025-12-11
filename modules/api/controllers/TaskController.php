@@ -9,6 +9,7 @@ use yii\filters\ContentNegotiator;
 use yii\web\Response;
 use app\models\Task;
 use yii\data\ActiveDataProvider;
+use app\services\CacheService;
 
 /**
  * TaskController implements the CRUD actions for Task model.
@@ -16,6 +17,14 @@ use yii\data\ActiveDataProvider;
 class TaskController extends ActiveController
 {
     public $modelClass = 'app\models\Task';
+
+    private $cacheService;
+
+    public function init()
+    {
+        parent::init();
+        $this->cacheService = Yii::$container->get(CacheService::class);
+    }
 
     /**
      * {@inheritdoc}
@@ -55,17 +64,20 @@ class TaskController extends ActiveController
      */
     public function actionIndex()
     {
-        $query = Task::find();
-        
-        return new ActiveDataProvider([
-            'query' => $query,
-            'sort' => [
-                'defaultOrder' => [
-                    'created_at' => SORT_DESC,
-                ],
-                'attributes' => ['id', 'title', 'description', 'status', 'created_at', 'updated_at'],
-            ],
-        ]);
+        return $this->cacheService->getOrSet(
+            CacheService::KEY_TASKS_LIST,
+            function() {
+                return new ActiveDataProvider([
+                    'query' => Task::find(),
+                    'sort' => [
+                        'defaultOrder' => [
+                            'created_at' => SORT_DESC,
+                        ],
+                        'attributes' => ['id', 'title', 'description', 'status', 'created_at', 'updated_at'],
+                    ],
+                ]);
+            }
+        );
     }
 
     /**
@@ -90,6 +102,7 @@ class TaskController extends ActiveController
         $model = new Task();
 
         if ($model->load(Yii::$app->request->post(), '') && $model->save()) {
+            $this->cacheService->clearTasksCache();
             Yii::$app->response->setStatusCode(201);
             return $model;
         }
@@ -110,6 +123,7 @@ class TaskController extends ActiveController
         $model = $this->findModel($id);
         
         if ($model->load(Yii::$app->request->post(), '') && $model->save()) {
+            $this->cacheService->clearTasksCache();
             return $model;
         }
         
@@ -129,6 +143,7 @@ class TaskController extends ActiveController
         $model = $this->findModel($id);
         
         if ($model->delete()) {
+            $this->cacheService->clearTasksCache();
             Yii::$app->response->setStatusCode(204);
             return [];
         }
