@@ -19,54 +19,53 @@
       docker/          # Docker конфигурация
       web/             # Веб-корень
 
-
 ТРЕБОВАНИЯ
 -------------------
 - Docker и Docker Compose
-- Composer (для локальной разработки)
+- Composer (Локальная разработка)
 
 УСТАНОВКА И ЗАПУСК
 -------------------
 ### Используя Docker
 
-1. Клонируйте репозиторий:
+1. Склонируйте репозиторий:
+```
+      git clone https://github.com/renat1015/todo-api
 
-    git clone https://github.com/renat1015/todo-api
-    
-    cd todo-api
-    
+      cd todo-api
+```
 2.  Скопируйте файл окружения:
-
-    cp .env.example .env   
-    
+```
+      cp .env.example .env
+```
 3.  Запустите контейнеры:
-
-    docker-compose up -d
-    
+```
+      docker-compose up -d
+```
 4.  Выполните инициализацию:
-
-    docker-compose exec web bash docker/scripts/init.sh
-    
+```
+      docker-compose exec web bash docker/scripts/init.sh
+```
 5.  Приложение будет доступно по адресу:
 
-    http://localhost:8080
+      http://localhost:8080
 
 ### Без Docker (Локальная разработка)
 
 1.  Установите зависимости:
-
-    composer install
-    
+```
+      composer install
+```
 2.  Настройте базу данных в файле config/db.php
     
 3.  Примените миграции:
-
-    php yii migrate
-    
+```
+      php yii migrate
+```
 4.  Запустите встроенный сервер:
-
-    php yii serve
-
+```
+      php yii serve
+```
 
 КОНФИГУРАЦИЯ
 -------------
@@ -87,12 +86,8 @@ return [
 
 API Endpoints
 -------------
-GET /api/task - Получение списка всех задач
-
-GET /api/task/`id` - Получение информации о конкретной задаче
-
-POST /api/task - Создание новой задачи
-
-PUT /api/task/`id` - Обновление задачи
-
-DELETE /api/task/`id` - Удаление задачи
+- GET /api/task - Получение списка всех задач
+- GET /api/task/`id` - Получение информации о конкретной задаче
+- POST /api/task - Создание новой задачи
+- PUT /api/task/`id` - Обновление задачи
+- DELETE /api/task/`id` - Удаление задачи
