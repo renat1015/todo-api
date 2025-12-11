@@ -19,7 +19,7 @@ $config = [
             'useMemcached' => true,
             'servers' => [
                 [
-                    'host' => 'localhost',
+                    'host' => getenv('MEMCACHED_HOST'),
                     'port' => 11211,
                 ],
             ],

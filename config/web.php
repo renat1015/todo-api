@@ -13,7 +13,7 @@ $config = [
     ],
     'components' => [
         'request' => [
-            'cookieValidationKey' => 'Zy0gx-zFQVxWwPrCIBDVeUoUywwii5v0',
+            'cookieValidationKey' => getenv('COOKIE_VALIDATION_KEY'),
             'parsers' => [
                 'application/json' => 'yii\web\JsonParser',
             ],
@@ -27,7 +27,7 @@ $config = [
             'useMemcached' => true,
             'servers' => [
                 [
-                    'host' => 'localhost',
+                    'host' => getenv('MEMCACHED_HOST'),
                     'port' => 11211,
                 ],
             ],
