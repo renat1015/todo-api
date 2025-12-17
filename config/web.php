@@ -1,5 +1,8 @@
 <?php
 
+use app\services\CacheServiceInterface;
+use app\services\MemcachedCacheService;
+
 $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
 
@@ -13,11 +16,17 @@ $config = [
     ],
     'components' => [
         'request' => [
-            // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
-            'cookieValidationKey' => 'gQsXqNVKrS2bb9lSgkQfQhRRnz5OpFu7',
+            'cookieValidationKey' => getenv('COOKIE_VALIDATION_KEY'),
         ],
-        'cache' => [
-            'class' => 'yii\caching\FileCache',
+        'memcachedCache' => [
+            'class' => 'yii\caching\MemCache',
+            'useMemcached' => true,
+            'servers' => [
+                [
+                    'host' => getenv('MEMCACHED_HOST'),
+                    'port' => 11211,
+                ],
+            ],
         ],
         'user' => [
             'identityClass' => 'app\models\User',
@@ -25,12 +34,6 @@ $config = [
         ],
         'errorHandler' => [
             'errorAction' => 'site/error',
-        ],
-        'mailer' => [
-            'class' => \yii\symfonymailer\Mailer::class,
-            'viewPath' => '@app/mail',
-            // send all mails to a file by default.
-            'useFileTransport' => true,
         ],
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
@@ -51,24 +54,29 @@ $config = [
         ],
         */
     ],
+    'container' => [
+        'definitions' => [
+            CacheServiceInterface::class => MemcachedCacheService::class,
+        ],
+    ],
     'params' => $params,
 ];
 
 if (YII_ENV_DEV) {
-    // configuration adjustments for 'dev' environment
     $config['bootstrap'][] = 'debug';
     $config['modules']['debug'] = [
         'class' => 'yii\debug\Module',
-        // uncomment the following to add your IP if you are not connecting from localhost.
-        //'allowedIPs' => ['127.0.0.1', '::1'],
     ];
 
     $config['bootstrap'][] = 'gii';
     $config['modules']['gii'] = [
         'class' => 'yii\gii\Module',
-        // uncomment the following to add your IP if you are not connecting from localhost.
-        //'allowedIPs' => ['127.0.0.1', '::1'],
     ];
+
+    if (file_exists(__DIR__ . '/web-local.php')) {
+        $localConfig = require __DIR__ . '/web-local.php';
+        $config = \yii\helpers\ArrayHelper::merge($config, $localConfig);
+    }
 }
 
 return $config;
