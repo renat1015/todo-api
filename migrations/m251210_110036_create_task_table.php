@@ -17,7 +17,7 @@ class m251210_110036_create_task_table extends Migration
             'id' => $this->primaryKey(),
             'title' => $this->string(255)->notNull(),
             'description' => $this->text(),
-            'status' => $this->string(20)->notNull()->defaultValue(TaskStatus::NEW),
+            'status' => $this->string(20)->notNull()->defaultValue(TaskStatus::NEW->value),
             'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
             'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
         ]);
